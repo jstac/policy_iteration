@@ -26,5 +26,5 @@ always converges to the optimal policy at a geometric rate.
 Code
 --------
 
-Matlab code for replicating the numerical application can be found in the
-**programs** folder.
+Matlab code for replicating the numerical application can be found listed
+above.
