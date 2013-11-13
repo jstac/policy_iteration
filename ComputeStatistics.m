@@ -60,9 +60,13 @@ for rr=1:length(rho_vec);
     xisize = length(xigrid);
     nwsize = length(nwgrid);
     
+    nwgridplot = min(nwgrid):1:25+min(nwgrid);
+    xigridplot = 1:1:25;
+    p1plot = interpne(xigrid,nwgrid,p1,xigridplot',nwgridplot,'linear');
+   
     % Calculate consumption and savings policy
-    c = InverseMargU(p1,mu);
-    a = repmat(nwgrid,1,xisize) - c;
+    c = InverseMargU(p1plot,mu);
+    a = repmat(nwgridplot',1,length(xigridplot)) - c;
 
     nrow = 3;
     ncol = length(rho_vec);
@@ -72,17 +76,17 @@ for rr=1:length(rho_vec);
     g3 = rr + ncol*2;
 
     figure(fig);
-    subplot(nrow,ncol,g1); mesh(nwgrid,xigrid,c');
+    subplot(nrow,ncol,g1); mesh(nwgridplot,xigridplot,c');
     xlabel('net worth','FontSize',12);
     ylabel('\xi_t','FontSize',12);
     zlabel('consumption','FontSize',12);
-    axis([0 max(nwgrid) 0 max(xigrid) 0 max(nwgrid)]);
+    axis([0 max(nwgridplot) 0 max(xigridplot) 0 30]);
     title(['\rho = ',num2str(rho)],'FontSize',18);
-    subplot(nrow,ncol,g2); mesh(nwgrid,xigrid,a');
+    subplot(nrow,ncol,g2); mesh(nwgridplot,xigridplot,a');
     xlabel('net worth','FontSize',12);
     ylabel('\xi_t','FontSize',12);
     zlabel('savings','FontSize',12);
-    axis([0 max(nwgrid) 0 max(xigrid) 0 max(nwgrid)]);
+    axis([0 max(nwgridplot) 0 max(xigridplot) 0 25]);
     
     % Simulate path of consumption   
     if exist('Panel');
@@ -129,9 +133,9 @@ for rr=1:length(rho_vec);
     insur_coeff_mat = zeros(4,Time-1);
 
     for t = 2:Time;
-        Change = Panel(:,:,t) -  Panel(:,:,t-1);
+        Change = log(Panel(:,:,t)) -  log(Panel(:,:,t-1));
         ChangeC = Change(:,1);
-        temp =  cov([Panel(:,end-3:1:end,t) ChangeC]) ; 
+        temp =  cov([log(Panel(:,end-3:1:end,t)) ChangeC]) ; 
         insur_coeff = 1 - temp(:,end)./diag(temp); %permanent, transitory, transitory shock with change in consumption
         insur_coeff_mat(:,t-1) = insur_coeff(1:end-1);            
     end;
